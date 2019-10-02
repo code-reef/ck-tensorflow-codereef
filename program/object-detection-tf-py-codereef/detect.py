@@ -103,12 +103,12 @@ def get_handles_to_tensors():
   return tensor_dict, image_tensor
 
 
-def load_image(image_files,iter_num,processed_image_ids,params):
-
+def load_image(image_dir,image_files,iter_num,processed_image_ids,params):
+  
   image_file = image_files[iter_num]
-  image_id = ck_utils.filename_to_id(image_file, params["DATASET_TYPE"])
-  processed_image_ids.append(image_id)
-  image_path = os.path.join(params["IMAGES_DIR"], image_file)
+  print(image_file)
+  processed_image_ids.append(1)
+  image_path = os.path.join(image_dir, image_file)
   img = cv2.imread(image_path)
   orig_image = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
   # Load to numpy array, separately from original image
@@ -249,7 +249,7 @@ def detect(category_index, func_defs):
       listImg = os.listdir(os.path.join(params["CUR_DIR"],"input"))
       if (len(listImg) > 0):
         iter += 1
-        iter_num = 1
+        iter_num = 0
         # image_files = listImg[0]
         image_files = ck_utils.load_image_list(os.path.join(params["CUR_DIR"],"input"), params["BATCH_COUNT"]*params["BATCH_SIZE"], params["SKIP_IMAGES"])
 
@@ -258,7 +258,7 @@ def detect(category_index, func_defs):
         # THIRD HOOK: preprocess
 
         print(func_defs["preprocess"])
-        image_data,processed_image_ids,image_size,original_image = func_defs["preprocess"](image_files,iter_num,processed_image_ids,params)
+        image_data,processed_image_ids,image_size,original_image = func_defs["preprocess"](os.path.join(params["CUR_DIR"],"input"),image_files,iter_num,processed_image_ids,params)
         
         load_time = time.time() - load_time_begin
         load_time_total += load_time
@@ -268,14 +268,17 @@ def detect(category_index, func_defs):
         output_dict = sess.run(tensor_dict, feed_dict)
         #FOURTH HOOK: convert from tensorRT to normal dict
         output_dict =func_defs["out_conv"](output_dict)
+        print(output_dict)
         
         detect_time = time.time() - detect_time_begin
         
+        params["DETECTIONS_OUT_DIR"] = os.path.join(params["CUR_DIR"],'output')
+        func_defs["postprocess"](image_files,iter_num, image_size,original_image,image_data,output_dict, category_index, params)
+        
         sinum=str(iter)
-        f = os.path.join(params["CUR_DIR"],'output/cr_result_'+('0'*(8-len(sinum)))+sinum+'.json')
-        s=json.dumps(solution, indent=4, sort_keys=True)
+        
         with open(f, 'w') as json_file:
-          json.dump(solution, json_file, indent=4, sort_keys=True)
+          json.dump(output_dict, json_file, indent=4, sort_keys=True)
         
         if params["FULL_REPORT"]:
           print('Detected in {:.4f}s'.format(detect_time))
