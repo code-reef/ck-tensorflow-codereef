@@ -249,11 +249,12 @@ def detect(category_index, func_defs):
       listImg = os.listdir(os.path.join(params["CUR_DIR"],"input"))
       if (len(listImg) > 0):
         iter += 1
-
+        iter_num = 1
         image_files = listImg[0]
     
         load_time_begin = time.time()
         # THIRD HOOK: preprocess
+
         image_data,processed_image_ids,image_size,original_image = func_defs["preprocess"](image_files,iter_num,processed_image_ids,params)
         
         load_time = time.time() - load_time_begin
