@@ -250,11 +250,14 @@ def detect(category_index, func_defs):
       if (len(listImg) > 0):
         iter += 1
         iter_num = 1
-        image_files = listImg[0]
+        # image_files = listImg[0]
+        image_files = ck_utils.load_image_list(os.path.join(params["CUR_DIR"],"input"), params["BATCH_COUNT"]*params["BATCH_SIZE"], params["SKIP_IMAGES"])
+
     
         load_time_begin = time.time()
         # THIRD HOOK: preprocess
 
+        print(func_defs["preprocess"])
         image_data,processed_image_ids,image_size,original_image = func_defs["preprocess"](image_files,iter_num,processed_image_ids,params)
         
         load_time = time.time() - load_time_begin
