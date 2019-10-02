@@ -236,32 +236,41 @@ def detect(category_index, func_defs):
     images_processed = 0
     processed_image_ids = []
     loop_limit = len(image_files) if (params["ENABLE_BATCH"]) == 0 else params["BATCH_COUNT"]  #defines loop boundary, that is different if batch or non batch processing are involved. the structure of the loop is however the same.
-    for iter_num in range (loop_limit):
- 
-      load_time_begin = time.time()
-      # THIRD HOOK: preprocess
-      image_data,processed_image_ids,image_size,original_image = func_defs["preprocess"](image_files,iter_num,processed_image_ids,params)
-      
-      load_time = time.time() - load_time_begin
-      load_time_total += load_time
-      # Detect image: common
-      detect_time_begin = time.time()
-      feed_dict = {input_tensor: image_data}
-      output_dict = sess.run(tensor_dict, feed_dict)
-      #FOURTH HOOK: convert from tensorRT to normal dict
-      output_dict =func_defs["out_conv"](output_dict)
-      
-      detect_time = time.time() - detect_time_begin
-      # Exclude first image from averaging
-      if iter_num > 0 or params["BATCH_COUNT"] == 1:
-        detect_time_total += detect_time
-        images_processed += 1## may be revision needed
- 
-      # FIFTH hook: process results
-      func_defs["postprocess"](image_files,iter_num, image_size,original_image,image_data,output_dict, category_index, params)
+    
+    status = True
+    iter = 0
 
-      if params["FULL_REPORT"]:
-        print('Detected in {:.4f}s'.format(detect_time))
+    # start infinite loop 
+    while(status):
+      
+      listImg = os.listdir(os.path.join(params["CUR_DIR"],"input"))
+      if (len(listImg) > 0):
+        iter += 1
+
+        image_files = listImg[0]
+    
+        load_time_begin = time.time()
+        # THIRD HOOK: preprocess
+        image_data,processed_image_ids,image_size,original_image = func_defs["preprocess"](image_files,iter_num,processed_image_ids,params)
+        
+        load_time = time.time() - load_time_begin
+        load_time_total += load_time
+        # Detect image: common
+        detect_time_begin = time.time()
+        feed_dict = {input_tensor: image_data}
+        output_dict = sess.run(tensor_dict, feed_dict)
+        #FOURTH HOOK: convert from tensorRT to normal dict
+        output_dict =func_defs["out_conv"](output_dict)
+        
+        detect_time = time.time() - detect_time_begin
+
+        f = os.path.join(params["CUR_DIR"],'output/cr_result_'+('0'*(8-len(sinum)))+sinum+'.json')
+        s=json.dumps(solution, indent=4, sort_keys=True)
+        with open(f, 'w') as json_file:
+          json.dump(solution, json_file, indent=4, sort_keys=True)
+        
+        if params["FULL_REPORT"]:
+          print('Detected in {:.4f}s'.format(detect_time))
 
   # Save processed images ids list to be able to run
   # evaluation without repeating detections (CK_SKIP_DETECTION=YES)
