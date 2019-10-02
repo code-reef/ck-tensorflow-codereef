@@ -239,7 +239,10 @@ def detect(category_index, func_defs):
     
     status = True
     iter = 0
-
+    if not os.path.isdir(os.path.join(params["CUR_DIR"],"input")):
+      os.mkdir(os.path.join(params["CUR_DIR"],"input"))
+    if not os.path.isdir(os.path.join(params["CUR_DIR"],"output")):
+      os.mkdir(os.path.join(params["CUR_DIR"],"output"))
     # start infinite loop 
     while(status):
       
