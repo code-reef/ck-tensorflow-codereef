@@ -266,7 +266,8 @@ def detect(category_index, func_defs):
         output_dict =func_defs["out_conv"](output_dict)
         
         detect_time = time.time() - detect_time_begin
-
+        
+        sinum=str(iter)
         f = os.path.join(params["CUR_DIR"],'output/cr_result_'+('0'*(8-len(sinum)))+sinum+'.json')
         s=json.dumps(solution, indent=4, sort_keys=True)
         with open(f, 'w') as json_file:
