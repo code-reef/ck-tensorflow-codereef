@@ -136,11 +136,10 @@ def save_detection_txt(image_file, image_size, output_dict, category_index, para
       class_name = category_index[class_id]['name']
     y1, x1, y2, x2 = output_dict['detection_boxes'][i]
     score = output_dict['detection_scores'][i]
-    solution["objects"].append ({'w': x1*im_width,'h': y1*im_height,'x': x2*im_width,'y': y2*im_height,'name':class_name ,
-    'score':score, 'class_id':class_id})
+    solution["objects"].append ({'w': x1*im_width,'h': y1*im_height,'x': x2*im_width,'y': y2*im_height,'name':class_name})
   
-  with open(f, 'w') as json_file:
-      json.dump(solution, res_file, indent=4, sort_keys=True)
+  with open(res_file, 'w') as json_file:
+      json.dump(solution, json_file , indent=4, sort_keys=True)
 
 
 
@@ -274,13 +273,13 @@ def detect(category_index, func_defs):
         output_dict = sess.run(tensor_dict, feed_dict)
         #FOURTH HOOK: convert from tensorRT to normal dict
         output_dict =func_defs["out_conv"](output_dict)
-        print(output_dict)
-        
         detect_time = time.time() - detect_time_begin
         
         params["DETECTIONS_OUT_DIR"] = os.path.join(params["CUR_DIR"],'output')
         func_defs["postprocess"](image_files,iter_num, image_size,original_image,image_data,output_dict, category_index, params)
         
+        # deleat the detected image
+        os.remove(os.path.join(os.path.join(params["CUR_DIR"],'input'),image_files[0]))
         
         if params["FULL_REPORT"]:
           print('Detected in {:.4f}s'.format(detect_time))
