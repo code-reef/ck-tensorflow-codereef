@@ -279,6 +279,8 @@ def detect(category_index, func_defs):
           params["DETECTIONS_OUT_DIR"] = os.path.join(params["CUR_DIR"],'output')
           func_defs["postprocess"](image_files,iter_num, image_size,original_image,image_data,output_dict, category_index, params)
           
+          os.remove(os.path.join(os.path.join(params["CUR_DIR"],"input"),image_files[0]))
+
           if params["FULL_REPORT"]:
             print('Detected in {:.4f}s'.format(detect_time))
       except:
