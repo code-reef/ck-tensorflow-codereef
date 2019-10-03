@@ -136,8 +136,9 @@ def save_detection_txt(image_file, image_size, output_dict, category_index, para
       class_name = category_index[class_id]['name']
     y1, x1, y2, x2 = output_dict['detection_boxes'][i]
     score = output_dict['detection_scores'][i]
+
     solution["objects"].append ({'x': x1*im_width,'y': y1*im_height,'w': (x2-x1)*im_width,'h': (y2-y1)*im_height,'name':class_name})
-  
+
   with open(res_file, 'w') as json_file:
       json.dump(solution, json_file , indent=4, sort_keys=True)
 
@@ -257,7 +258,7 @@ def detect(category_index, func_defs):
           iter_num = 0
           # image_files = listImg[0]
           image_files = ck_utils.load_image_list(os.path.join(params["CUR_DIR"],"input"), params["BATCH_COUNT"]*params["BATCH_SIZE"], params["SKIP_IMAGES"])
-    
+
           load_time_begin = time.time()
           # THIRD HOOK: preprocess
 
@@ -271,6 +272,7 @@ def detect(category_index, func_defs):
           output_dict = sess.run(tensor_dict, feed_dict)
           #FOURTH HOOK: convert from tensorRT to normal dict
           output_dict =func_defs["out_conv"](output_dict)
+
           
           detect_time = time.time() - detect_time_begin
           
