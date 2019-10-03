@@ -136,7 +136,7 @@ def save_detection_txt(image_file, image_size, output_dict, category_index, para
       class_name = category_index[class_id]['name']
     y1, x1, y2, x2 = output_dict['detection_boxes'][i]
     score = output_dict['detection_scores'][i]
-    solution["objects"].append ({'w': x1*im_width,'h': y1*im_height,'x': x2*im_width,'y': y2*im_height,'name':class_name ,
+    solution["objects"].append ({'x': x1*im_width,'y': y1*im_height,'w': (x2-x1)*im_width,'h': (y2-y1)*im_height,'name':class_name ,
     'score':score, 'class_id':class_id})
   
   with open(f, 'w') as json_file:
@@ -251,39 +251,41 @@ def detect(category_index, func_defs):
       os.mkdir(os.path.join(params["CUR_DIR"],"output"))
     # start infinite loop 
     while(status):
+      try:
+        listImg = os.listdir(os.path.join(params["CUR_DIR"],"input"))
+        if (len(listImg) > 0):
+          iter += 1
+          iter_num = 0
+          # image_files = listImg[0]
+          image_files = ck_utils.load_image_list(os.path.join(params["CUR_DIR"],"input"), params["BATCH_COUNT"]*params["BATCH_SIZE"], params["SKIP_IMAGES"])
+
       
-      listImg = os.listdir(os.path.join(params["CUR_DIR"],"input"))
-      if (len(listImg) > 0):
-        iter += 1
-        iter_num = 0
-        # image_files = listImg[0]
-        image_files = ck_utils.load_image_list(os.path.join(params["CUR_DIR"],"input"), params["BATCH_COUNT"]*params["BATCH_SIZE"], params["SKIP_IMAGES"])
+          load_time_begin = time.time()
+          # THIRD HOOK: preprocess
 
-    
-        load_time_begin = time.time()
-        # THIRD HOOK: preprocess
-
-        print(func_defs["preprocess"])
-        image_data,processed_image_ids,image_size,original_image = func_defs["preprocess"](os.path.join(params["CUR_DIR"],"input"),image_files,iter_num,processed_image_ids,params)
-        
-        load_time = time.time() - load_time_begin
-        load_time_total += load_time
-        # Detect image: common
-        detect_time_begin = time.time()
-        feed_dict = {input_tensor: image_data}
-        output_dict = sess.run(tensor_dict, feed_dict)
-        #FOURTH HOOK: convert from tensorRT to normal dict
-        output_dict =func_defs["out_conv"](output_dict)
-        print(output_dict)
-        
-        detect_time = time.time() - detect_time_begin
-        
-        params["DETECTIONS_OUT_DIR"] = os.path.join(params["CUR_DIR"],'output')
-        func_defs["postprocess"](image_files,iter_num, image_size,original_image,image_data,output_dict, category_index, params)
-        
-        
-        if params["FULL_REPORT"]:
-          print('Detected in {:.4f}s'.format(detect_time))
+          print(func_defs["preprocess"])
+          image_data,processed_image_ids,image_size,original_image = func_defs["preprocess"](os.path.join(params["CUR_DIR"],"input"),image_files,iter_num,processed_image_ids,params)
+          
+          load_time = time.time() - load_time_begin
+          load_time_total += load_time
+          # Detect image: common
+          detect_time_begin = time.time()
+          feed_dict = {input_tensor: image_data}
+          output_dict = sess.run(tensor_dict, feed_dict)
+          #FOURTH HOOK: convert from tensorRT to normal dict
+          output_dict =func_defs["out_conv"](output_dict)
+          print(output_dict)
+          
+          detect_time = time.time() - detect_time_begin
+          
+          params["DETECTIONS_OUT_DIR"] = os.path.join(params["CUR_DIR"],'output')
+          func_defs["postprocess"](image_files,iter_num, image_size,original_image,image_data,output_dict, category_index, params)
+          
+          
+          if params["FULL_REPORT"]:
+            print('Detected in {:.4f}s'.format(detect_time))
+        except:
+          print('error')
 
   # Save processed images ids list to be able to run
   # evaluation without repeating detections (CK_SKIP_DETECTION=YES)
