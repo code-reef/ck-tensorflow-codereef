@@ -104,7 +104,7 @@ def get_handles_to_tensors():
 
 
 def load_image(image_dir,image_files,iter_num,processed_image_ids,params):
-  
+      
   image_file = image_files[iter_num]
   print(image_file)
   processed_image_ids.append(1)
@@ -123,19 +123,25 @@ def load_image(image_dir,image_files,iter_num,processed_image_ids,params):
 def save_detection_txt(image_file, image_size, output_dict, category_index, params):
   (im_width, im_height) = image_size
   file_name = os.path.splitext(image_file)[0]
-  res_file = os.path.join(params["DETECTIONS_OUT_DIR"], file_name) + '.txt'
-  with open(res_file, 'w') as f:
-    f.write('{:d} {:d}\n'.format(im_width, im_height))
-    for i in range(output_dict['num_detections']):
-      class_id = output_dict['detection_classes'][i]
-      if 'display_name' in category_index[class_id]:
-        class_name = category_index[class_id]['display_name']
-      else:
-        class_name = category_index[class_id]['name']
-      y1, x1, y2, x2 = output_dict['detection_boxes'][i]
-      score = output_dict['detection_scores'][i]
-      f.write('{:.2f} {:.2f} {:.2f} {:.2f} {:.3f} {:d} {}\n'\
-        .format(x1*im_width, y1*im_height, x2*im_width, y2*im_height, score, class_id, class_name))
+  res_file = os.path.join(params["DETECTIONS_OUT_DIR"], file_name) + '.json'
+
+
+  solution = {'image_format' : { 'width':im_width , 'height':im_height}}
+  solution["objects"] = []
+  for i in range(output_dict['num_detections']):
+    class_id = output_dict['detection_classes'][i]
+    if 'display_name' in category_index[class_id]:
+      class_name = category_index[class_id]['display_name']
+    else:
+      class_name = category_index[class_id]['name']
+    y1, x1, y2, x2 = output_dict['detection_boxes'][i]
+    score = output_dict['detection_scores'][i]
+    solution["objects"].append ({'w': x1*im_width,'h': y1*im_height,'x': x2*im_width,'y': y2*im_height,'name':class_name ,
+    'score':score, 'class_id':class_id})
+  
+  with open(f, 'w') as json_file:
+      json.dump(solution, res_file, indent=4, sort_keys=True)
+
 
 
 def save_detection_img(image_file, image_np, output_dict, category_index,params):
@@ -275,10 +281,6 @@ def detect(category_index, func_defs):
         params["DETECTIONS_OUT_DIR"] = os.path.join(params["CUR_DIR"],'output')
         func_defs["postprocess"](image_files,iter_num, image_size,original_image,image_data,output_dict, category_index, params)
         
-        sinum=str(iter)
-        
-        with open(f, 'w') as json_file:
-          json.dump(output_dict, json_file, indent=4, sort_keys=True)
         
         if params["FULL_REPORT"]:
           print('Detected in {:.4f}s'.format(detect_time))
