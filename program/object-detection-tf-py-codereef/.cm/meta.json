@@ -90,7 +90,9 @@
   "tags": [
     "object-detection",
     "tf",
-    "lang-python"
+    "lang-python",
+    "codereef_workflow",
+    "codereef_workflow_webcam"
   ],
   "template": "yes",
   "template_type": "Object Detection via TensorFlow (Python)"
