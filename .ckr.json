@@ -1,9 +1,15 @@
 {
-  "data_uoa": "ck-tensorflow-codereef",
-  "data_uid": "c8d8309660ad5f7f",
   "data_alias": "ck-tensorflow-codereef",
   "data_name": "ck-tensorflow-codereef",
+  "data_uid": "c8d8309660ad5f7f",
+  "data_uoa": "ck-tensorflow-codereef",
   "dict": {
+    "private": "yes",
+    "repo_deps": [
+      {
+        "repo_uoa": "ck-tensorflow"
+      }
+    ],
     "shared": "git",
     "url": "https://github.com/code-reef/ck-tensorflow-codereef"
   }
