@@ -8,6 +8,9 @@
     "repo_deps": [
       {
         "repo_uoa": "ck-tensorflow"
+      },
+      {
+        "repo_uoa": "ck-mlperf"
       }
     ],
     "shared": "git",
