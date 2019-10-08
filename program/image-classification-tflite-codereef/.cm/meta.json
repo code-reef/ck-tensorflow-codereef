@@ -113,7 +113,9 @@
   "tags": [
     "image-classification",
     "tflite",
-    "lang-cpp"
+    "lang-cpp",
+    "codereef-workflow",
+    "codereef-workflow-webcam"
   ],
   "target_file": "classification",
   "template_type": "Image Classification via TFLite (C++)"
