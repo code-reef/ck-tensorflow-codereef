@@ -48,22 +48,10 @@
         "copy_env_to_remote": [
           "CK_ENV_TENSORFLOW_MODEL_INPUT_LAYER_NAME",
           "CK_ENV_TENSORFLOW_MODEL_OUTPUT_LAYER_NAME",
-          "CK_ENV_DATASET_IMAGENET_PREPROCESSED_SUBSET_FOF",
-          "CK_ENV_DATASET_IMAGENET_PREPROCESSED_INPUT_SQUARE_SIDE",
           "CK_ENV_TENSORFLOW_MODEL_NORMALIZE_DATA",
           "CK_ENV_TENSORFLOW_MODEL_SUBTRACT_MEAN"
         ],
         "fine_grain_timer_file": "tmp-ck-timer.json",
-        "post_process_via_ck": {
-          "data_uoa": "b98ee24399ef4c3a",
-          "module_uoa": "script",
-          "script_name": "postprocess"
-        },
-        "pre_process_via_ck": {
-          "data_uoa": "b98ee24399ef4c3a",
-          "module_uoa": "script",
-          "script_name": "schindler"
-        },
         "run_cmd_main": "$#BIN_FILE#$",
         "run_input_files": [
           "$<<CK_ENV_TENSORFLOW_MODEL_TFLITE_FILEPATH>>$"
@@ -104,7 +92,8 @@
     "CK_BATCH_SIZE": 1,
     "CK_RESULTS_DIR": "predictions",
     "CK_SILENT_MODE": 0,
-    "CK_SKIP_IMAGES": 0
+    "CK_SKIP_IMAGES": 0,
+    "CK_STREAM_IMAGES": 0
   },
   "skip_bin_ext": "yes",
   "source_files": [
