@@ -283,6 +283,8 @@ def detect(category_index, func_defs):
 
           if params["FULL_REPORT"]:
             print('Detected in {:.4f}s'.format(detect_time))
+      except KeyboardInterrupt:
+        status = False
       except:
         print('error')
 
