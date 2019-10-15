@@ -210,6 +210,7 @@ private:
 class BenchmarkSession {
 public:
   BenchmarkSession(const BenchmarkSettings* settings): _settings(settings) {
+    _batch_files.emplace_back(_settings->image_list()[0]);
   }
 
   virtual ~BenchmarkSession() {}
@@ -234,6 +235,10 @@ public:
     _batch_files.clear();
     for (int i = begin; i < end; i++)
       _batch_files.emplace_back(_settings->image_list()[i]);
+    return true;
+  }
+
+  bool get_availability() {
     return true;
   }
 
@@ -397,11 +402,15 @@ public:
 
   void load_images(const std::vector<std::string>& batch_images) override {
     int image_offset = 0;
+    std::cout << "Loading image batch" <<std::endl;
+    std::cout << "Image loading: " << batch_images.size()<< std::endl;
     for (auto image_file : batch_images) {
+      std::cout << "Image loading: " << image_file << std::endl;
       _in_data->load(image_file);
       _in_converter->convert(_in_data.get(), _in_ptr + image_offset);
       image_offset += _in_data->size();
     }
+    std::cout<< "loading ended" <<std::endl;
   }
 
   void save_results(const std::vector<std::string>& batch_images) override {

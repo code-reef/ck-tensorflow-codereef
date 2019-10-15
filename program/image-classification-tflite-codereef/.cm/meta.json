@@ -1,5 +1,5 @@
 {
-  "backup_data_uid": "46fa1f0bd6d1bdf6",
+  "backup_data_uid": "6e58bd944e048e47",
   "compile_deps": {
     "compiler": {
       "local": "yes",
@@ -28,7 +28,7 @@
   ],
   "compiler_env": "CK_CXX",
   "compiler_flags_as_env": "$<<CK_COMPILER_FLAG_CPP11>>$ $<<CK_ENV_LIB_TF_DEF>>$ -Wall -Wno-sign-compare",
-  "data_name": "image-classification-tflite-codereef",
+  "data_name": "image-classification-tflite",
   "extra_ld_vars": "$<<CK_ENV_LIB_TF_LIBS_DIRS>>$ $<<CK_ENV_LIB_TF_LIBS>>$",
   "linker_add_lib_as_env": [
     "CK_CXX_EXTRA",
@@ -54,15 +54,15 @@
           "CK_ENV_TENSORFLOW_MODEL_SUBTRACT_MEAN"
         ],
         "fine_grain_timer_file": "tmp-ck-timer.json",
-        "post_process_via_ck": {
-          "data_uoa": "b98ee24399ef4c3a",
-          "module_uoa": "script",
-          "script_name": "postprocess"
-        },
         "pre_process_via_ck": {
-          "data_uoa": "b98ee24399ef4c3a",
-          "module_uoa": "script",
-          "script_name": "schindler"
+          "data_uoa":       "b98ee24399ef4c3a",
+          "module_uoa":     "script",
+          "script_name":    "schindler"
+        },
+        "post_process_via_ck": {
+          "data_uoa":       "b98ee24399ef4c3a",
+          "module_uoa":     "script",
+          "script_name":    "postprocess"
         },
         "run_cmd_main": "$#BIN_FILE#$",
         "run_input_files": [
@@ -102,9 +102,9 @@
   "run_vars": {
     "CK_BATCH_COUNT": 1,
     "CK_BATCH_SIZE": 1,
+    "CK_SKIP_IMAGES": 0,
     "CK_RESULTS_DIR": "predictions",
-    "CK_SILENT_MODE": 0,
-    "CK_SKIP_IMAGES": 0
+    "CK_SILENT_MODE": 0
   },
   "skip_bin_ext": "yes",
   "source_files": [
@@ -118,5 +118,6 @@
     "codereef-workflow-webcam"
   ],
   "target_file": "classification",
+  "template": "yes",
   "template_type": "Image Classification via TFLite (C++)"
 }
