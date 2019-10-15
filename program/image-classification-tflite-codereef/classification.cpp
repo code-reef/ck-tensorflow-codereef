@@ -40,7 +40,7 @@ int main(int argc, char* argv[]) {
     // currently interpreter->tensor(input_index)->dims[0] = 1
     if (settings.batch_size != 1)
       throw string("Only BATCH_SIZE=1 is currently supported");
-    
+      
     BenchmarkSession session(&settings);
 
     unique_ptr<IBenchmark> benchmark;
@@ -112,8 +112,9 @@ int main(int argc, char* argv[]) {
 
     cout << "\nProcessing batches..." << endl;
     measure_prediction([&]{
-      while (session.get_next_batch()) {
+      while (session.get_availability()) {
         session.measure_begin();
+        
         benchmark->load_images(session.batch_files());
         session.measure_end_load_images();
 

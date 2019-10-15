@@ -237,6 +237,11 @@ public:
     return true;
   }
 
+  bool get_availability() {
+
+    return true;
+  }
+
   /// Begin measuring of new benchmark stage.
   /// Only one stage can be measured at a time.
   void measure_begin() {
