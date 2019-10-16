@@ -10,6 +10,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <cstdio>
 
 #include <chrono>
 #include <dirent.h>
@@ -20,6 +21,7 @@
 #include <string.h>
 #include <thread>
 #include <vector>
+#include <algorithm>
 
 #include <xopenme.h>
 
@@ -358,7 +360,7 @@ public:
 
   void remove(const std::string& filename) {
     auto path = _dir + '/' + filename;
-    std::remove(path);
+    std::remove(path.c_str());
   }
 };
 
@@ -417,7 +419,6 @@ public:
   }
 
   void delete_images(const std::vector<std::string>& batch_images) override {
-    int image_offset = 0;
     for (auto image_file : batch_images) {
       std::cout << "Image Deleting: " << image_file << std::endl;
       _in_data->remove(image_file);
