@@ -104,7 +104,10 @@
     "CK_BATCH_SIZE": 1,
     "CK_SKIP_IMAGES": 0,
     "CK_RESULTS_DIR": "predictions",
-    "CK_SILENT_MODE": 0
+    "CK_SILENT_MODE": 0,
+    "CK_IMAGE_DIR": 0,
+    "CK_IMAGE_FILE": "WEBCAM_000.rgb8"
+
   },
   "skip_bin_ext": "yes",
   "source_files": [
