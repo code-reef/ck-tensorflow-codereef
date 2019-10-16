@@ -113,18 +113,24 @@ int main(int argc, char* argv[]) {
     cout << "\nProcessing batches..." << endl;
     measure_prediction([&]{
       while (session.get_availability()) {
-        session.measure_begin();
-        
-        benchmark->load_images(session.batch_files());
-        session.measure_end_load_images();
+        try{
+          session.measure_begin();
+          
+          benchmark->load_images(session.batch_files());
+          session.measure_end_load_images();
 
-        session.measure_begin();
-        if (interpreter->Invoke() != kTfLiteOk)
-          throw "Failed to invoke tflite";
-        session.measure_end_prediction();
+          session.measure_begin();
+          if (interpreter->Invoke() != kTfLiteOk)
+            throw "Failed to invoke tflite";
+          session.measure_end_prediction();
 
-        benchmark->save_results(session.batch_files());
+          benchmark->save_results(session.batch_files());
+        }
+        catch (const std::exception& e) {
+          std::cout << "Waiting for new input"<<std::endl; // information from length_error printed
+        }
       }
+        
     });
 
     finish_benchmark(session);
