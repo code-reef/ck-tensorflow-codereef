@@ -127,7 +127,8 @@ int main(int argc, char* argv[]) {
           benchmark->save_results(session.batch_files());
         }
         catch (const string& error_message) {
-          std::cout << "Waiting for new input"<<std::endl; // information from length_error printed
+          std::cout << "ERROR: " << error_message << std::endl; // information from length_error printed
+          std::cout << "Waiting for new input"<< std::endl; 
         }
       }
         
