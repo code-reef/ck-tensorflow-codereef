@@ -210,8 +210,6 @@ public:
 
   const std::string& image_list() const { return image_file; }
 
-  std::string image_file;
-
   int number_of_threads() { return _number_of_threads; }
 
   std::string graph_file() { return _graph_file; }
