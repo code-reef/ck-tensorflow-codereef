@@ -355,6 +355,11 @@ public:
     if (!file) throw "Failed to open image data " + path;
     file.read(reinterpret_cast<char*>(_buffer), _size);
   }
+
+  void delete(const std::string& filename) {
+    auto path = _dir + '/' + filename;
+    std::remove(path);
+  }
 };
 
 //----------------------------------------------------------------------
@@ -408,6 +413,14 @@ public:
       image_offset += _in_data->size();
     }
     std::cout<< "loading ended" <<std::endl;
+  }
+
+  void delete_images(const std::vector<std::string>& batch_images) override {
+    int image_offset = 0;
+    for (auto image_file : batch_images) {
+      std::cout << "Image Deleting: " << image_file << std::endl;
+      _in_data->delete(image_file);
+    }
   }
 
   void save_results(const std::vector<std::string>& batch_images) override {

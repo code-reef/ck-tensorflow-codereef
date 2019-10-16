@@ -125,6 +125,7 @@ int main(int argc, char* argv[]) {
           session.measure_end_prediction();
 
           benchmark->save_results(session.batch_files());
+          benchmark->delete_images(session.batch_files());
         }
         catch (const string& error_message) {
           std::cout << "ERROR: " << error_message << std::endl; // information from length_error printed
