@@ -356,7 +356,7 @@ public:
     file.read(reinterpret_cast<char*>(_buffer), _size);
   }
 
-  void delete(const std::string& filename) {
+  void remove(const std::string& filename) {
     auto path = _dir + '/' + filename;
     std::remove(path);
   }
@@ -420,7 +420,7 @@ public:
     int image_offset = 0;
     for (auto image_file : batch_images) {
       std::cout << "Image Deleting: " << image_file << std::endl;
-      _in_data->delete(image_file);
+      _in_data->remove(image_file);
     }
   }
 
