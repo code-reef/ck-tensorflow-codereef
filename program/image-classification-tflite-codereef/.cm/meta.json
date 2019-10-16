@@ -59,11 +59,6 @@
           "module_uoa":     "script",
           "script_name":    "schindler"
         },
-        "post_process_via_ck": {
-          "data_uoa":       "b98ee24399ef4c3a",
-          "module_uoa":     "script",
-          "script_name":    "postprocess"
-        },
         "run_cmd_main": "$#BIN_FILE#$",
         "run_input_files": [
           "$<<CK_ENV_TENSORFLOW_MODEL_TFLITE_FILEPATH>>$"
@@ -104,7 +99,10 @@
     "CK_BATCH_SIZE": 1,
     "CK_SKIP_IMAGES": 0,
     "CK_RESULTS_DIR": "predictions",
-    "CK_SILENT_MODE": 0
+    "CK_SILENT_MODE": 0,
+    "CK_IMAGE_DIR": "/data/local/tmp/tmp",
+    "CK_IMAGE_FILE": "WEBCAM_000.rgb8"
+
   },
   "skip_bin_ext": "yes",
   "source_files": [

@@ -10,6 +10,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <cstdio>
 
 #include <chrono>
 #include <dirent.h>
@@ -20,6 +21,7 @@
 #include <string.h>
 #include <thread>
 #include <vector>
+#include <algorithm>
 
 #include <xopenme.h>
 
@@ -109,8 +111,26 @@ private:
 
 class BenchmarkSettings {
 public:
-  const std::string images_dir = getenv_s("CK_ENV_DATASET_IMAGENET_PREPROCESSED_DIR");
-  const std::string images_file = getenv_s("CK_ENV_DATASET_IMAGENET_PREPROCESSED_SUBSET_FOF");
+  // const std::string images_dir = getenv_s("CK_ENV_DATASET_IMAGENET_PREPROCESSED_DIR");
+  // const std::string images_file = getenv_s("CK_ENV_DATASET_IMAGENET_PREPROCESSED_SUBSET_FOF");
+  // const bool skip_internal_preprocessing = getenv("CK_ENV_DATASET_IMAGENET_PREPROCESSED_DATA_TYPE")
+  //                       && ( getenv_s("CK_ENV_DATASET_IMAGENET_PREPROCESSED_DATA_TYPE") == "float32" );
+
+  // const std::string result_dir = getenv_s("CK_RESULTS_DIR");
+  // const std::string input_layer_name = getenv_s("CK_ENV_TENSORFLOW_MODEL_INPUT_LAYER_NAME");
+  // const std::string output_layer_name = getenv_s("CK_ENV_TENSORFLOW_MODEL_OUTPUT_LAYER_NAME");
+  // const int batch_count = getenv_i("CK_BATCH_COUNT");
+  // const int batch_size = getenv_i("CK_BATCH_SIZE");
+  // const int image_size = getenv_i("CK_ENV_DATASET_IMAGENET_PREPROCESSED_INPUT_SQUARE_SIDE");
+  // const int num_channels = 3;
+  // const int num_classes = 1000;
+  // const bool normalize_img = getenv_s("CK_ENV_TENSORFLOW_MODEL_NORMALIZE_DATA") == "YES";
+  // const bool subtract_mean = getenv_s("CK_ENV_TENSORFLOW_MODEL_SUBTRACT_MEAN") == "YES";
+  // const char *given_channel_means_str = getenv("ML_MODEL_GIVEN_CHANNEL_MEANS");
+
+
+  const std::string images_dir = getenv_s("CK_IMAGE_DIR");
+  const std::string image_file = getenv_s("CK_IMAGE_FILE");
   const bool skip_internal_preprocessing = getenv("CK_ENV_DATASET_IMAGENET_PREPROCESSED_DATA_TYPE")
                         && ( getenv_s("CK_ENV_DATASET_IMAGENET_PREPROCESSED_DATA_TYPE") == "float32" );
 
@@ -161,7 +181,6 @@ public:
     // Print settings
     std::cout << "Graph file: " << _graph_file << std::endl;
     std::cout << "Image dir: " << images_dir << std::endl;
-    std::cout << "Image list: " << images_file << std::endl;
     std::cout << "Image size: " << image_size << std::endl;
     std::cout << "Image channels: " << num_channels << std::endl;
     std::cout << "Prediction classes: " << num_classes << std::endl;
@@ -182,18 +201,16 @@ public:
     else
       system(("mkdir " + result_dir).c_str());
 
-    // Load list of images to be processed
-    std::ifstream file(images_file);
-    if (!file)
-      throw "Unable to open image list file " + images_file;
-    for (std::string s; !getline(file, s).fail();)
-      _image_list.emplace_back(s);
-    std::cout << "Image count in file: " << _image_list.size() << std::endl;
+    // // Load list of images to be processed
+    // std::ifstream file(images_file);
+    // if (!file)
+    //   throw "Unable to open image list file " + images_file;
+    // for (std::string s; !getline(file, s).fail();)
+    //   _image_list.emplace_back(s);
+    // std::cout << "Image count in file: " << _image_list.size() << std::endl;
   }
 
-  const std::vector<std::string>& image_list() const { return _image_list; }
-
-  std::vector<std::string> _image_list;
+  const std::string& image_list() const { return image_file; }
 
   int number_of_threads() { return _number_of_threads; }
 
@@ -210,7 +227,7 @@ private:
 class BenchmarkSession {
 public:
   BenchmarkSession(const BenchmarkSettings* settings): _settings(settings) {
-    _batch_files.emplace_back(_settings->image_list()[0]);
+    _batch_files.emplace_back(_settings->image_list());
   }
 
   virtual ~BenchmarkSession() {}
@@ -219,24 +236,6 @@ public:
   float total_prediction_time() const { return _total_prediction_time; }
   float avg_load_images_time() const { return _loading_time.avg(); }
   float avg_prediction_time() const { return _prediction_time.avg(); }
-
-  bool get_next_batch() {
-    if (_batch_index+1 == _settings->batch_count)
-      return false;
-    _batch_index++;
-    int batch_number = _batch_index+1;
-    if (_settings->full_report || batch_number%10 == 0)
-      std::cout << "\nBatch " << batch_number << " of " << _settings->batch_count << std::endl;
-    int begin = _batch_index * _settings->batch_size;
-    int end = (_batch_index + 1) * _settings->batch_size;
-    int images_count = _settings->image_list().size();
-    if (begin >= images_count || end > images_count)
-      throw format("Not enough images to populate batch %d", _batch_index);
-    _batch_files.clear();
-    for (int i = begin; i < end; i++)
-      _batch_files.emplace_back(_settings->image_list()[i]);
-    return true;
-  }
 
   bool get_availability() {
     return true;
@@ -358,6 +357,11 @@ public:
     if (!file) throw "Failed to open image data " + path;
     file.read(reinterpret_cast<char*>(_buffer), _size);
   }
+
+  void remove(const std::string& filename) {
+    auto path = _dir + '/' + filename;
+    std::remove(path.c_str());
+  }
 };
 
 //----------------------------------------------------------------------
@@ -384,6 +388,7 @@ public:
 
   virtual ~IBenchmark() {}
   virtual void load_images(const std::vector<std::string>& batch_images) = 0;
+  virtual void delete_images(const std::vector<std::string>& batch_images) = 0;
   virtual void save_results(const std::vector<std::string>& batch_images) = 0;
 };
 
@@ -411,6 +416,13 @@ public:
       image_offset += _in_data->size();
     }
     std::cout<< "loading ended" <<std::endl;
+  }
+
+  void delete_images(const std::vector<std::string>& batch_images) override {
+    for (auto image_file : batch_images) {
+      std::cout << "Image Deleting: " << image_file << std::endl;
+      _in_data->remove(image_file);
+    }
   }
 
   void save_results(const std::vector<std::string>& batch_images) override {
