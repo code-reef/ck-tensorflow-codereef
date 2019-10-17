@@ -6,6 +6,9 @@
  * See CK LICENSE.txt for licensing details.
  */
 
+#include <thread>
+#include <chrono>
+
 #include "benchmark.h"
 
 #ifdef TF_LITE_1_13
@@ -133,6 +136,7 @@ int main(int argc, char* argv[]) {
           std::cout << "ERROR: " << error_message << std::endl; // information from length_error printed
           std::cout << "Waiting for new input"<< std::endl; 
         }
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
       }
         
     });
