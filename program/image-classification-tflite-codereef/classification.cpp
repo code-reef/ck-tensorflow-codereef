@@ -116,16 +116,18 @@ int main(int argc, char* argv[]) {
         try{
           session.measure_begin();
           
-          benchmark->load_images(session.batch_files());
-          session.measure_end_load_images();
+          if(benchmark->load_images(session.batch_files())){
+            session.measure_end_load_images();
 
-          session.measure_begin();
-          if (interpreter->Invoke() != kTfLiteOk)
-            throw "Failed to invoke tflite";
-          session.measure_end_prediction();
+            session.measure_begin();
+            if (interpreter->Invoke() != kTfLiteOk)
+              throw "Failed to invoke tflite";
+            session.measure_end_prediction();
 
-          benchmark->save_results(session.batch_files());
-          benchmark->delete_images(session.batch_files());
+            benchmark->save_results(session.batch_files());
+            benchmark->delete_images(session.batch_files());
+          }
+          
         }
         catch (const string& error_message) {
           std::cout << "ERROR: " << error_message << std::endl; // information from length_error printed
