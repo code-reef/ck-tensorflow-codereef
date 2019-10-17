@@ -417,15 +417,14 @@ public:
 
   inline bool load_images(const std::vector<std::string>& batch_images) override {
     int image_offset = 0;
-    std::cout << "Loading image batch" <<std::endl;
-    std::cout << "Image loading: " << batch_images.size()<< std::endl;
     for (auto image_file : batch_images) {
-      std::cout << "Image loading: " << image_file << std::endl;
       if (_in_data->load(image_file)){
+        std::cout << "Image loading: " << image_file << std::endl;
         _in_converter->convert(_in_data.get(), _in_ptr + image_offset);
         image_offset += _in_data->size();
       }
       else {
+        std::cout << "Image missing: " << image_file << std::endl;
         //if the file doesnot exist stop the processing 
         return false;
       }
