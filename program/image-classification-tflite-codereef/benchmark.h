@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <cstdio>
+#include <sys/stat.h>
 
 #include <chrono>
 #include <dirent.h>
