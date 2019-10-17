@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <cstdio>
+#include <sys/stat.h>
 
 #include <chrono>
 #include <dirent.h>
@@ -351,11 +352,20 @@ public:
     s->image_size * s->image_size * s->num_channels * (s->skip_internal_preprocessing ? sizeof(float) : sizeof(uint8_t)),
     s->images_dir) {}
   
-  void load(const std::string& filename) {
+  inline bool load(const std::string& filename) {
     auto path = _dir + '/' + filename;
-    std::ifstream file(path, std::ios::in | std::ios::binary);
-    if (!file) throw "Failed to open image data " + path;
-    file.read(reinterpret_cast<char*>(_buffer), _size);
+    if(exist_images(path)){
+      std::ifstream file(path, std::ios::in | std::ios::binary);
+      if (!file) throw "Failed to open image data " + path;
+      file.read(reinterpret_cast<char*>(_buffer), _size);
+      return true;
+    }
+    return false;
+  }
+
+  inline bool exist_images(const std::string& name) {
+    struct stat buffer;   
+    return (stat (name.c_str(), &buffer) == 0); 
   }
 
   void remove(const std::string& filename) {
@@ -387,7 +397,7 @@ public:
   bool has_background_class = false;
 
   virtual ~IBenchmark() {}
-  virtual void load_images(const std::vector<std::string>& batch_images) = 0;
+  virtual bool load_images(const std::vector<std::string>& batch_images) = 0;
   virtual void delete_images(const std::vector<std::string>& batch_images) = 0;
   virtual void save_results(const std::vector<std::string>& batch_images) = 0;
 };
@@ -405,17 +415,22 @@ public:
     _out_converter.reset(new TOutConverter(settings));
   }
 
-  void load_images(const std::vector<std::string>& batch_images) override {
+  inline bool load_images(const std::vector<std::string>& batch_images) override {
     int image_offset = 0;
-    std::cout << "Loading image batch" <<std::endl;
-    std::cout << "Image loading: " << batch_images.size()<< std::endl;
     for (auto image_file : batch_images) {
-      std::cout << "Image loading: " << image_file << std::endl;
-      _in_data->load(image_file);
-      _in_converter->convert(_in_data.get(), _in_ptr + image_offset);
-      image_offset += _in_data->size();
+      if (_in_data->load(image_file)){
+        std::cout << "Image loading: " << image_file << std::endl;
+        _in_converter->convert(_in_data.get(), _in_ptr + image_offset);
+        image_offset += _in_data->size();
+      }
+      else {
+        std::cout << "Image missing: " << image_file << std::endl;
+        //if the file doesnot exist stop the processing 
+        return false;
+      }
     }
     std::cout<< "loading ended" <<std::endl;
+    return true;
   }
 
   void delete_images(const std::vector<std::string>& batch_images) override {

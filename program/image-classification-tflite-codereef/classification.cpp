@@ -6,6 +6,9 @@
  * See CK LICENSE.txt for licensing details.
  */
 
+#include <thread>
+#include <chrono>
+
 #include "benchmark.h"
 
 #ifdef TF_LITE_1_13
@@ -116,21 +119,24 @@ int main(int argc, char* argv[]) {
         try{
           session.measure_begin();
           
-          benchmark->load_images(session.batch_files());
-          session.measure_end_load_images();
+          if(benchmark->load_images(session.batch_files())){
+            session.measure_end_load_images();
 
-          session.measure_begin();
-          if (interpreter->Invoke() != kTfLiteOk)
-            throw "Failed to invoke tflite";
-          session.measure_end_prediction();
+            session.measure_begin();
+            if (interpreter->Invoke() != kTfLiteOk)
+              throw "Failed to invoke tflite";
+            session.measure_end_prediction();
 
-          benchmark->save_results(session.batch_files());
-          benchmark->delete_images(session.batch_files());
+            benchmark->save_results(session.batch_files());
+            benchmark->delete_images(session.batch_files());
+          }
+          
         }
         catch (const string& error_message) {
           std::cout << "ERROR: " << error_message << std::endl; // information from length_error printed
           std::cout << "Waiting for new input"<< std::endl; 
         }
+        //std::this_thread::sleep_for(std::chrono::milliseconds(0));
       }
         
     });
