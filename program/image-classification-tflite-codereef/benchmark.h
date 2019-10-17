@@ -351,11 +351,20 @@ public:
     s->image_size * s->image_size * s->num_channels * (s->skip_internal_preprocessing ? sizeof(float) : sizeof(uint8_t)),
     s->images_dir) {}
   
-  void load(const std::string& filename) {
+  inline bool load(const std::string& filename) {
     auto path = _dir + '/' + filename;
-    std::ifstream file(path, std::ios::in | std::ios::binary);
-    if (!file) throw "Failed to open image data " + path;
-    file.read(reinterpret_cast<char*>(_buffer), _size);
+    if(exist_images(path)){
+      std::ifstream file(path, std::ios::in | std::ios::binary);
+      if (!file) throw "Failed to open image data " + path;
+      file.read(reinterpret_cast<char*>(_buffer), _size);
+      return true;
+    }
+    return false;s
+  }
+
+  inline bool exist_images(const std::string& name) {
+    struct stat buffer;   
+    return (stat (name.c_str(), &buffer) == 0); 
   }
 
   void remove(const std::string& filename) {
@@ -405,19 +414,13 @@ public:
     _out_converter.reset(new TOutConverter(settings));
   }
 
-  inline bool exist_images(const std::string& name) {
-    struct stat buffer;   
-    return (stat (name.c_str(), &buffer) == 0); 
-  }
-
   inline bool load_images(const std::vector<std::string>& batch_images) override {
     int image_offset = 0;
     std::cout << "Loading image batch" <<std::endl;
     std::cout << "Image loading: " << batch_images.size()<< std::endl;
     for (auto image_file : batch_images) {
       std::cout << "Image loading: " << image_file << std::endl;
-      if (exist_images(image_file)){
-        _in_data->load(image_file);
+      if (_in_data->load(image_file)){
         _in_converter->convert(_in_data.get(), _in_ptr + image_offset);
         image_offset += _in_data->size();
       }
