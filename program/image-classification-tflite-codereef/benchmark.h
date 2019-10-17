@@ -359,7 +359,7 @@ public:
       file.read(reinterpret_cast<char*>(_buffer), _size);
       return true;
     }
-    return false;s
+    return false;
   }
 
   inline bool exist_images(const std::string& name) {
