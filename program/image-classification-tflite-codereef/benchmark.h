@@ -417,6 +417,7 @@ public:
 
   inline bool load_images(const std::vector<std::string>& batch_images) override {
     int image_offset = 0;
+
     for (auto image_file : batch_images) {
       if (_in_data->load(image_file)){
         std::cout << "Image loading: " << image_file << std::endl;
@@ -424,8 +425,9 @@ public:
         image_offset += _in_data->size();
       }
       else {
-        std::cout << "Image missing: " << image_file << std::endl;
-        //if the file doesnot exist stop the processing 
+        std::cout << "Image missing : " << image_file << std::endl;
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        //if the file does not exist stop the processing 
         return false;
       }
     }
