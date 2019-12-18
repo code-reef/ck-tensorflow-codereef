@@ -59,11 +59,11 @@
       "sort": 5,
       "tags": "compiler,python"
     },
-    "tensorflow-model-api": {
+    "tensorflow-model-api-object-detection": {
       "local": "yes",
-      "name": "Tensorflow models api",
+      "name": "Tensorflow models api (object detection)",
       "sort": 80,
-      "tags": "tensorflow,model,api"
+      "tags": "tensorflow,model,api,object-detection"
     },
     "tool-coco": {
       "local": "yes",
