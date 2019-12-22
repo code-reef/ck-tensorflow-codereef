@@ -1,0 +1,4 @@
+Forked and CodeReefied portable CK workflows for crowd-benchmarking.
+
+* Original sources: https://github.com/ctuning/ck-tensorflow
+* Original license: https://github.com/ctuning/ck/blob/master/LICENSE.txt (BSD 3-clause)
