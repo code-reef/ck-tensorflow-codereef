@@ -45,7 +45,7 @@ def ck_postprocess(i):
 
   if cmt=='KITTI':
      import calc_metrics_kitti
-  else cmt=='OID':
+  elif cmt=='OID':
      import calc_metrics_oid
   else:
      import calc_metrics_coco
