@@ -23,9 +23,6 @@ import matplotlib; matplotlib.use('Agg')
 import ck_utils
 import converter_results
 import converter_annotations
-import calc_metrics_kitti
-import calc_metrics_coco
-import calc_metrics_oid
 from object_detection.utils import label_map_util
 
 LABELMAP_FILE = ENV['LABELMAP_FILE']
@@ -42,6 +39,17 @@ IMAGE_LIST_FILE = ENV['IMAGE_LIST_FILE']
 TIMER_JSON = ENV['TIMER_JSON']
 
 def ck_postprocess(i):
+
+  env=i.get('env',{})
+  cmt=env.get('CK_METRIC_TYPE','')
+
+  if cmt=='KITTI':
+     import calc_metrics_kitti
+  elif cmt=='OID':
+     import calc_metrics_oid
+  else:
+     import calc_metrics_coco
+
   def evaluate(processed_image_ids, categories_list):
     # Convert annotations from original format of the dataset
     # to a format specific for a tool that will calculate metrics
