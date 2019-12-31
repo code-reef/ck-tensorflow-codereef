@@ -1,5 +1,5 @@
 {
-  "backup_data_uid": "6e58bd944e048e47",
+  "backup_data_uid": "543b19f623f0fd87",
   "compile_deps": {
     "compiler": {
       "local": "yes",
@@ -28,7 +28,7 @@
   ],
   "compiler_env": "CK_CXX",
   "compiler_flags_as_env": "$<<CK_COMPILER_FLAG_CPP11>>$ $<<CK_ENV_LIB_TF_DEF>>$ -Wall -Wno-sign-compare",
-  "data_name": "image-classification-tflite",
+  "data_name": "image-classification-tflite-codereef-android",
   "extra_ld_vars": "$<<CK_ENV_LIB_TF_LIBS_DIRS>>$ $<<CK_ENV_LIB_TF_LIBS>>$",
   "linker_add_lib_as_env": [
     "CK_CXX_EXTRA",
@@ -55,7 +55,7 @@
         ],
         "fine_grain_timer_file": "tmp-ck-timer.json",
         "pre_process_via_ck": {
-          "script_name":    "codereef_preprocess"
+          "script_name": "codereef_preprocess"
         },
         "run_cmd_main": "$#BIN_FILE#$",
         "run_input_files": [
@@ -95,12 +95,11 @@
   "run_vars": {
     "CK_BATCH_COUNT": 1,
     "CK_BATCH_SIZE": 1,
-    "CK_SKIP_IMAGES": 0,
+    "CK_IMAGE_DIR": "/data/local/tmp/tmp",
+    "CK_IMAGE_FILE": "WEBCAM_000.rgb8",
     "CK_RESULTS_DIR": "predictions",
     "CK_SILENT_MODE": 0,
-    "CK_IMAGE_DIR": "input",
-    "CK_IMAGE_FILE": "WEBCAM_000.rgb8"
-
+    "CK_SKIP_IMAGES": 0
   },
   "skip_bin_ext": "yes",
   "source_files": [
